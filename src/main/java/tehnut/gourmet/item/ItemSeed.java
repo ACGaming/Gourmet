@@ -16,9 +16,13 @@ import net.minecraftforge.common.EnumPlantType;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import tehnut.gourmet.Gourmet;
+import tehnut.gourmet.core.RegistrarGourmet;
 import tehnut.gourmet.core.data.Harvest;
+import tehnut.gourmet.core.util.IHarvestContainer;
 
-public class ItemSeed extends Item implements IPlantable {
+import javax.annotation.Nonnull;
+
+public class ItemSeed extends Item implements IPlantable, IHarvestContainer {
 
     private final Harvest harvest;
     private Block crop;
@@ -63,8 +67,14 @@ public class ItemSeed extends Item implements IPlantable {
     @Override
     public IBlockState getPlant(IBlockAccess world, BlockPos pos) {
         if (crop == null)
-            crop = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(Gourmet.MODID, "crop_" + harvest.getSimpleName()));
+            crop = RegistrarGourmet.getCrops().get(harvest);
 
         return crop.getDefaultState();
+    }
+
+    @Nonnull
+    @Override
+    public Harvest getHarvest() {
+        return harvest;
     }
 }

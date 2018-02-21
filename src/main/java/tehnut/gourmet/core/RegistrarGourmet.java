@@ -22,6 +22,7 @@ import tehnut.gourmet.Gourmet;
 import tehnut.gourmet.block.BlockBerryBush;
 import tehnut.gourmet.block.BlockCrop;
 import tehnut.gourmet.core.data.Harvest;
+import tehnut.gourmet.core.util.FuckinHackThatShit;
 import tehnut.gourmet.core.util.GourmetLog;
 import tehnut.gourmet.core.util.ResourceUtil;
 import tehnut.gourmet.core.util.SmeltingLoader;
@@ -110,6 +111,10 @@ public class RegistrarGourmet {
         SmeltingLoader.gatherRecipes(smeltingRecipes);
         for (SmeltingLoader.SmeltingRecipe recipe : smeltingRecipes)
             GameRegistry.addSmelting(recipe.getInput(), recipe.getOutput(), recipe.getExperience());
+
+        // Since recipes run last, let's check our hacky shit before model registry runs
+        FuckinHackThatShit.checkBlocks();
+        FuckinHackThatShit.checkItems();
     }
 
     @SideOnly(Side.CLIENT)
@@ -134,6 +139,10 @@ public class RegistrarGourmet {
 
     public static Map<Harvest, BlockCrop> getCrops() {
         return CROPS;
+    }
+
+    public static Map<Harvest, BlockBerryBush> getBerryBushes() {
+        return BERRY_BUSHES;
     }
 
     public static Map<Harvest, ItemEdible> getEdibles() {

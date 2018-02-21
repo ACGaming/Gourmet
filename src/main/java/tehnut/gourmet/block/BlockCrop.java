@@ -9,10 +9,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import tehnut.gourmet.core.RegistrarGourmet;
 import tehnut.gourmet.core.data.Harvest;
+import tehnut.gourmet.core.util.IHarvestContainer;
 
+import javax.annotation.Nonnull;
 import java.util.Random;
 
-public class BlockCrop extends BlockCrops {
+public class BlockCrop extends BlockCrops implements IHarvestContainer {
 
     private final Harvest harvest;
     private final PropertyInteger age;
@@ -67,5 +69,11 @@ public class BlockCrop extends BlockCrops {
     @Override
     protected final BlockStateContainer createBlockState() {
         return new BlockStateContainer.Builder(this).add(AGE).build();
+    }
+
+    @Nonnull
+    @Override
+    public Harvest getHarvest() {
+        return harvest;
     }
 }

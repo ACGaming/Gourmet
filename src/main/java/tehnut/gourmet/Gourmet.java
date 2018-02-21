@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import tehnut.gourmet.core.RegistrarGourmet;
 import tehnut.gourmet.core.RegistrarGourmetHarvests;
+import tehnut.gourmet.core.util.FuckinHackThatShit;
 import tehnut.gourmet.proxy.IProxy;
 
 @Mod(modid = Gourmet.MODID, name = Gourmet.NAME, version = Gourmet.VERSION)
@@ -35,6 +36,11 @@ public class Gourmet {
     public static IProxy PROXY;
 
     @Mod.EventHandler
+    public void constructed(FMLConstructionEvent event) {
+        FuckinHackThatShit.replaceAddCallbacks();
+    }
+
+    @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         PROXY.preInit();
 
@@ -50,5 +56,11 @@ public class Gourmet {
     @Mod.EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         PROXY.postInit();
+    }
+
+    @Mod.EventHandler
+    public void onRegistryRemap(FMLModIdMappingEvent event) {
+        FuckinHackThatShit.checkBlocks();
+        FuckinHackThatShit.checkItems();
     }
 }

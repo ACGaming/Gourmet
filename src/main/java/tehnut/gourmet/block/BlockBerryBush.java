@@ -1,5 +1,6 @@
 package tehnut.gourmet.block;
 
+import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.BlockGrass;
 import net.minecraft.block.SoundType;
@@ -13,27 +14,31 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.items.ItemHandlerHelper;
 import tehnut.gourmet.Gourmet;
+import tehnut.gourmet.core.RegistrarGourmet;
 import tehnut.gourmet.core.data.Harvest;
+import tehnut.gourmet.core.util.IHarvestContainer;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Random;
 
-public class BlockBerryBush extends BlockBush {
+public class BlockBerryBush extends BlockBush implements IHarvestContainer {
 
     public static final IProperty<Integer> AGE = PropertyInteger.create("age", 0, 3);
     public static final IProperty<Boolean> TASTY = PropertyBool.create("tasty");
-    private static final AxisAlignedBB AGE_0_AABB = new AxisAlignedBB(0.3125D, 0, 0.3125D, 0.6875D, 0.375D, 0.6875D);
-    private static final AxisAlignedBB AGE_1_AABB = new AxisAlignedBB(0.25D, 0, 0.25D, 0.75D, 0.5D, 0.75D);
-    private static final AxisAlignedBB AGE_2_AABB = new AxisAlignedBB(0.125D, 0, 0.125D, 0.875D, 0.8125D, 0.875D);
+    private static final ImmutableMap<Integer, AxisAlignedBB> AABBS = ImmutableMap.of(
+            0, new AxisAlignedBB(0.3125D, 0, 0.3125D, 0.6875D, 0.375D, 0.6875D),
+            1, new AxisAlignedBB(0.25D, 0, 0.25D, 0.75D, 0.5D, 0.75D),
+            2, new AxisAlignedBB(0.125D, 0, 0.125D, 0.875D, 0.8125D, 0.875D),
+            3, FULL_BLOCK_AABB
+    );
 
     private final Harvest harvest;
     private Item berryItem;
@@ -51,7 +56,7 @@ public class BlockBerryBush extends BlockBush {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (state.getValue(TASTY) && !world.isRemote) {
             if (berryItem == null)
-                berryItem = ForgeRegistries.ITEMS.getValue(new ResourceLocation(Gourmet.MODID, "food_" + harvest.getSimpleName()));
+                berryItem = RegistrarGourmet.getEdibles().get(harvest);
 
             ItemHandlerHelper.giveItemToPlayer(player, new ItemStack(berryItem, Math.max(1, world.rand.nextInt(4))));
             world.setBlockState(pos, state.withProperty(TASTY, false));
@@ -82,13 +87,7 @@ public class BlockBerryBush extends BlockBush {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        switch (state.getValue(AGE)) {
-            case 0: return AGE_0_AABB;
-            case 1: return AGE_1_AABB;
-            case 2: return AGE_2_AABB;
-            case 3: return FULL_BLOCK_AABB;
-        }
-        return super.getBoundingBox(state, source, pos);
+        return AABBS.get(state.getValue(AGE));
     }
 
     @Override
@@ -125,5 +124,11 @@ public class BlockBerryBush extends BlockBush {
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer.Builder(this).add(AGE, TASTY).build();
+    }
+
+    @Nonnull
+    @Override
+    public Harvest getHarvest() {
+        return harvest;
     }
 }
